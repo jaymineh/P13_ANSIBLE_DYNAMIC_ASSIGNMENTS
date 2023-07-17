@@ -9,7 +9,7 @@
 
 - Run `mkdir /opt/ansible/ansible-config-artifact` to create the folder and run `sudo chmod -R 777 /opt/ansible/ansible/ansible-config-artifact` to grant Jenkins permission to save files there.
 
-![Ansible Folder](anscfg.png)
+![Ansible Folder](images/anscfg.png)
 
 - Opted for creating the folder in `/opt` as creating the folder in `/home/ubuntu/` didn't allow Jenkins access it. See error below:
 
@@ -19,15 +19,15 @@ java.nio.file.AccessDeniedException: /home/ubuntu/ansible-config-artifact
 
 - Install the `Copy Artifact` Jenkins module and create a new project. I named mine `save artifacts`. Configure the project as below:
 
-![Save Artifact Config 1](savecfg1.png)
+![Save Artifact Config 1](images/savecfg1.png)
 
-![Save Artifact Config 2](savecfg2.png)
+![Save Artifact Config 2](images/savecfg2.png)
 
-![Save Artifact Config 3](savecfg3.png)
+![Save Artifact Config 3](images/savecfg3.png)
 
 - Save and trigger the `test` job. If successful, the `save_artifacts` job will trigger and copy the files from the `test` job and save in the `/opt/ansible/ansible-config-artifact` folder.
 
-![Successful Run](consoleoutput.png)
+![Successful Run](images/consoleoutput.png)
 
 **Step 2 - Refactor Ansible Code By Importing Other Playbooks Into Parent Playbook**
 ---
@@ -102,7 +102,7 @@ ansible-playbook -i inventory/dev.yml playbooks/site.yml
 
 - After the playbook has run successfully, confirm if wireshark was deleted.
 
-![No Wireshark](nowire.png)
+![No Wireshark](images/nowire.png)
 
 *Over the next steps, 2 new servers will be spun up and configured using the created role for ansible to run the playbook. The end result will be a fully functional tooling website installed on the 2 newly configured UAT webservers*
 
@@ -219,13 +219,13 @@ roles_path = /opt/ansible/ansible-config-artifact/roles
 
   - I noticed I was getting a permission error on the `save_artifacts` project. I had used the `ansible-galaxy` module to create the `webserver` role and didn't realize the `/roles` folder ownership was set to `ubuntu` so Jenkins couldn't access it.
   
-  ![Jenkins Build Error](jenkinserr.png)
+  ![Jenkins Build Error](images/jenkinserr.png)
   
-  ![Ownership](roles.png)
+  ![Ownership](images/roles.png)
 
   - I resolved the issue by changing ownership of the `/roles` folder to jenkins by running `sudo chown -R jenkins:jenkins roles/` and restarting Jenkins by `sudo service jenkins restart`. After doing this, the build worked.
 
-  ![Jenkins Successful](jenkinsgood.png)
+  ![Jenkins Successful](images/jenkinsgood.png)
 
 - Run the playbook against the `uat` inventory with the `site.yml` playbook.
 
@@ -235,10 +235,10 @@ cd /opt/ansible/ansible-config-artifact/
 ansible-playbook -i inventory/uat.yml playbooks/site.yml
 ```
 
-![Ansible Play](play.png)
+![Ansible Play](images/play.png)
 
 - Confirm that UAT webservers can be reached from the browser. Go to `http://<Web1-UAT-Server-Public-IP-or-Public-DNS-Name>/index.php`. See result below.
 
-![Browser Check](success.png)
+![Browser Check](images/success.png)
 
 **Project 12 Deployed Successfully!**
